@@ -73,7 +73,7 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
 
             getMessages: async (params: getMessagesParams) => {
                 const chatId = Number(params.chatId);
-                const response = await client.get(`/chat/getjson/${chatId}/`);
+                const response = await client.get(`/chat/${chatId}/`);
                 return response.data;
             },
         }),
