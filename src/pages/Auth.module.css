@@ -1,7 +1,8 @@
 .auth {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 80px);
+    height: 100%;
+    width: 100%;
     justify-content: end;
     padding: 40px 44px;
 

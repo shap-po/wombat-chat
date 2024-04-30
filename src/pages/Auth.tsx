@@ -1,14 +1,16 @@
-import { useParams, redirect, Link } from "react-router-dom";
-import useAuth from "../hooks/auth";
 import { FormEvent } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import useAuth from "@hooks/auth";
+
+import Button from "@components/Button";
+import Input from "@components/Input";
 
 import styles from "./Auth.module.css";
-import Button from "../components/Button";
-import Input from "../components/Input";
 
 export default function Auth({ registering = false }) {
     const { redirectTo } = useParams();
     const { user, login, register } = useAuth();
+    const navigate = useNavigate();
 
     async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -35,22 +37,27 @@ export default function Auth({ registering = false }) {
         }
 
         // redirect to the specified URL
-        redirect(redirectTo ?? "/");
+        navigate(redirectTo ?? "/");
+        return;
     }
 
     // redirect if the user is already logged in
-    if (user) redirect(redirectTo ?? "/");
+    if (user) {
+        navigate("/");
+        return;
+    }
 
     return (
         <div className={[styles.auth, registering ? styles.register : ""].join(" ")}>
             <Link to="/" className={styles.logo}>
                 <h1>Womchat:</h1>
                 <div className={styles.logoBg}>
-                    <img src="womchat.svg" alt="Womchat logo" />
+                    <img src="/womchat.svg" />
                 </div>
             </Link>
             <form onSubmit={submit}>
                 <h2>{registering ? "Реєстрація" : "Вхід"}</h2>
+                {/* <img src="lock.svg" alt="" className={styles.lock} /> */}
                 <div className={styles.formFields}>
                     <Input
                         label="Логін"

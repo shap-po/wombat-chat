@@ -14,7 +14,15 @@ type User = {
 export type Message = {
     id: number;
     text: string;
-    user: User;
+    username: string;
+    timestamp: string;
+    isOwn: boolean;
+};
+
+export type Chat = {
+    id: number;
+    name: string;
+    lastMessage: string;
 };
 
 const defaultContext = {
@@ -25,6 +33,7 @@ const defaultContext = {
     getUser: async () => {},
 
     getMessages: async (_params: getMessagesParams) => [] as Message[],
+    getChats: async () => [] as Chat[],
 };
 
 // context for managing authentication state
@@ -33,6 +42,7 @@ export const AuthContext = createContext(defaultContext);
 // create a new axios client for making requests to the API
 const client = axios.create({
     baseURL: "http://127.0.0.1:8000",
+    validateStatus: () => true, // don't throw errors on non-2xx responses
 });
 
 // provider component that wraps the entire application
@@ -53,27 +63,49 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
             login: async (params: loginParams) => {
                 const response = await client.post("/login/", params);
                 console.log(response);
+                if (response.status !== 200) {
+                    return;
+                }
                 setUser(response.data || defaultContext.user);
             },
             logout: async () => {
                 const response = await client.post("/logout/");
                 console.log(response);
+                if (response.status !== 200) {
+                    return;
+                }
                 setUser(null);
             },
             register: async (params: registerParams) => {
                 const response = await client.post("/registration/", params);
                 console.log(response);
+                if (response.status !== 200) {
+                    return;
+                }
                 setUser(response.data || defaultContext.user);
             },
             getUser: async () => {
                 const response = await client.get("/api/user/");
                 console.log(response);
+                if (response.status !== 200) {
+                    return;
+                }
                 setUser(response.data || defaultContext.user);
             },
 
             getMessages: async (params: getMessagesParams) => {
                 const chatId = Number(params.chatId);
-                const response = await client.get(`/chat/${chatId}/`);
+                const response = await client.get(`/chats/${chatId}/`);
+                if (response.status !== 200) {
+                    return;
+                }
+                return response.data;
+            },
+            getChats: async () => {
+                const response = await client.get("/chats/");
+                if (response.status !== 200) {
+                    return;
+                }
                 return response.data;
             },
         }),

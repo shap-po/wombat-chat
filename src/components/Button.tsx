@@ -7,18 +7,18 @@ export default function Button({
     primary,
     ...props
 }: Readonly<{
-    children: React.ReactNode;
+    children?: React.ReactNode;
     to?: string;
     primary?: boolean;
     [key: string]: any;
 }>) {
-    const className = (primary ? style.primary : "") + " " + style.button;
+    const className = [style.button, primary ? style.primary : "", props.className].join(" ").trim();
     return to ? (
-        <Link to={to} className={className} {...props}>
+        <Link to={to} {...props} className={className}>
             {children}
         </Link>
     ) : (
-        <button className={className} {...props}>
+        <button {...props} className={className}>
             {children}
         </button>
     );
