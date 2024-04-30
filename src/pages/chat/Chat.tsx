@@ -13,18 +13,33 @@ import CurrentChat from "./components/CurrentChat";
 import styles from "./Chat.module.css";
 
 export default function Chat() {
-    const { getMessages } = useAuth();
+    const { getMessages, getChats, sendMessage } = useAuth();
     const { chatId } = useParams();
     const [messages, setMessages] = useState<Message[]>([]);
+    const [chats, setChats] = useState<ChatType[]>([]);
 
     const [wombatClicks, setWombatClicks] = useState(0);
 
-    const chats: ChatType[] = [];
+    useEffect(() => {
+        getChats().then((response) => {
+            setChats(response.chats || []);
+        });
+    }, []);
 
     useEffect(() => {
         if (!chatId) return;
-        getMessages({ chatId }).then(setMessages);
+        getMessages({ chatId }).then((response) => {
+            setMessages(response.messages || []);
+        });
     }, [chatId]);
+
+    function sendMessageToChat() {
+        if (!chatId) return;
+        const text = "Hello";
+        sendMessage({ chatId, text }).then((response) => {
+            setMessages([...messages, response]);
+        });
+    }
 
     return (
         <div className={styles.chat}>
@@ -56,7 +71,7 @@ export default function Chat() {
                     <CurrentChat messages={messages} />
                     <div className={styles.messageBox}>
                         <Input placeholder="Ваше повідомлення..." />
-                        <Button primary>
+                        <Button primary onClick={sendMessageToChat}>
                             <svg
                                 width="36"
                                 height="31"
